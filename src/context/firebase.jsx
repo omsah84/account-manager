@@ -2,6 +2,8 @@
 import { createContext, useContext } from "react";
 import PropTypes from "prop-types";
 import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -23,6 +25,7 @@ const firebaseAuth = getAuth(firebaseApp);
 
 const FirebaseContext = createContext(null);
 
+export const database = () => getFirestore(firebaseApp);
 export const useFirebase = () => useContext(FirebaseContext);
 
 export const FirebaseProvider = (props) => {
@@ -30,7 +33,7 @@ export const FirebaseProvider = (props) => {
     return createUserWithEmailAndPassword(firebaseAuth, email, password);
   };
 
-  const signinUserWithEmailAndPassword = (email, password) => {
+  const signinUserWithEmailAndPassword = ( email, password) => {
     return signInWithEmailAndPassword(firebaseAuth, email, password);
   };
 

@@ -4,9 +4,10 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useFirebase } from "../context/firebase";
+import { useFirebase, database } from "../context/firebase";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
+import { collection, addDoc } from "firebase/firestore";
 
 const MyTextField = styled(TextField)`
   width: 90%;
@@ -28,6 +29,7 @@ const data = {
 
 function Signup({ setValue }) {
   const firebase = useFirebase();
+  const db = database();
 
   const [signupdata, setSignupData] = useState(data);
   const [error, setError] = useState(false);
@@ -38,17 +40,25 @@ function Signup({ setValue }) {
     setSignupData({ ...signupdata, [name]: value });
   };
 
+  const createUserProfile = async (userId) => {
+    await addDoc(collection(db, "users"), {
+      uid: userId,
+      name: signupdata.name,
+      username: signupdata.username,
+      email: signupdata.email,
+    });
+  };
+
   const userSignup = () => {
     firebase
       .signupUserWithEmailAndPassword(signupdata.email, signupdata.password)
       .then((userCredential) => {
-        console.log(userCredential);
         setSuccess(true);
-        setError(false);
+        setError("");
+        createUserProfile(userCredential.user.uid);
       })
       .catch((error) => {
-        console.log(error);
-        setError(true);
+        setError(error.message);
         setSuccess(false);
       });
   };

@@ -6,8 +6,10 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
-import { useFirebase } from "../context/firebase";
+import { useFirebase, database } from "../context/firebase";
 import { useNavigate } from "react-router-dom";
+import { collection, getDocs } from "firebase/firestore";
+import { useEffect } from "react";
 
 const MyTextField = styled(TextField)`
   width: 90%;
@@ -28,24 +30,51 @@ const data = {
 
 function Login({ setValue }) {
   const firebase = useFirebase();
+  const db = database();
   const navigate = useNavigate();
   const [loginData, setLoginData] = useState(data);
   const [error, setError] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [users, setUsers] = useState([]);
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
     setLoginData({ ...loginData, [name]: value });
   };
 
+  const getUserId = (uid, uname) => {
+    users.map((data, index) => {
+      if (data.uid === uid) {
+        const username = users[index].username;
+        if (username === uname) {
+          navigate("/home");
+        } else {
+          setError(true);
+        }
+      }
+    });
+
+    // console.log(users[ed].username)
+    // console.log(idx);
+  };
+
+  const fetchUsers = async () => {
+    const querySnapshot = await getDocs(collection(db, "users"));
+    const usersList = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setUsers(usersList);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   const userLogin = () => {
     firebase
       .signinUserWithEmailAndPassword(loginData.email, loginData.password)
       .then((userCredential) => {
-        const user = userCredential.user;
-        console.log(user);
-        setSuccess(true);
-        navigate("/home");
+        getUserId(userCredential.user.uid, loginData.username);
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -98,11 +127,6 @@ function Login({ setValue }) {
         </MyButton>
         {error && true ? (
           <Typography color="red">Invailed email and passwrod!</Typography>
-        ) : (
-          <></>
-        )}
-        {success && true ? (
-          <Typography color="red">Login successful.</Typography>
         ) : (
           <></>
         )}
