@@ -9,7 +9,6 @@ import { database } from "../context/firebase";
 import PropTypes from "prop-types";
 import KeyValuePairs from "./KeyValuePairs";
 import Alert from "@mui/material/Alert";
-import CheckIcon from "@mui/icons-material/Check";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
