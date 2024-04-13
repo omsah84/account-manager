@@ -4,6 +4,10 @@ import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
+import { doc, getDoc } from "firebase/firestore";
+import { database } from "../context/firebase";
+import PropTypes from "prop-types";
+import KeyValuePairs from "./KeyValuePairs";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -20,16 +24,6 @@ const Search = styled("div")(({ theme }) => ({
   },
 }));
 
-// const SearchIconWrapper = styled("div")(({ theme }) => ({
-//   padding: theme.spacing(0, 2),
-//   height: "100%",
-//   position: "absolute",
-//   pointerEvents: "none",
-//   display: "flex",
-//   alignItems: "center",
-//   justifyContent: "center",
-// }));
-
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   "& .MuiInputBase-input": {
@@ -44,39 +38,86 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function SearchBox() {
+function SearchBox({ userId, userName }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const db = database();
+  const [queryData, setQueryData] = useState([]);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  // Function to get field values from a subdocument
+  const getSubdocumentFieldValues = async (
+    db,
+    mainCollection,
+    docId,
+    subcollection,
+    subdocId
+  ) => {
+    try {
+      // Reference to the subdocument
+      const subDocRef = doc(db, mainCollection, docId, subcollection, subdocId);
+
+      // Get the subdocument
+      const subDocSnap = await getDoc(subDocRef);
+
+      if (subDocSnap.exists()) {
+        // Access the field values
+        const data = subDocSnap.data();
+        setQueryData(data.keyValuePairs);
+        setIsSuccess(true);
+        console.log(queryData);
+      } else {
+        console.log("No such subdocument!");
+      }
+    } catch (error) {
+      console.error("Error getting subdocument:", error);
+    }
+  };
 
   const handleSearch = (event) => {
     event.preventDefault();
     // Implement the search logic here
-    console.log(searchQuery);
+    getSubdocumentFieldValues(
+      db,
+      "userAccountData",
+      userName,
+      searchQuery,
+      userId
+    );
   };
 
   return (
-    <Paper
-      component="form"
-      sx={{
-        p: "2px 4px",
-        display: "flex",
-        alignItems: "center",
-        width: "100%",
-      }}
-      onSubmit={handleSearch}
-    >
-      <Search sx={{ width: "100%" }}>
-        <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
-          <SearchIcon />
-        </IconButton>
-        <StyledInputBase
-          placeholder="Search…"
-          inputProps={{ "aria-label": "search" }}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </Search>
-    </Paper>
+    <>
+      <Paper
+        component="form"
+        sx={{
+          p: "2px 4px",
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+        }}
+        onSubmit={handleSearch}
+      >
+        <Search sx={{ width: "100%" }}>
+          <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
+            <SearchIcon />
+          </IconButton>
+          <StyledInputBase
+            placeholder="Search…"
+            inputProps={{ "aria-label": "search" }}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </Search>
+      </Paper>
+      {isSuccess ? <KeyValuePairs data={queryData} /> : <></>}
+    </>
   );
 }
 
 export default SearchBox;
+
+// Prop Types validation
+SearchBox.propTypes = {
+  userId: PropTypes.string.isRequired, // setValue prop is required and must be a function
+  userName: PropTypes.string.isRequired, // setValue prop is required and must be a function
+};

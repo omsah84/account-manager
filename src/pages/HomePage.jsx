@@ -3,6 +3,8 @@ import { styled } from "@mui/material/styles";
 import AddAccount from "../components/AddAccount";
 import { useState } from "react";
 import SearchBox from "../components/SearchBox";
+import PropTypes from "prop-types";
+
 
 const MyButton = styled(Button)`
   margin-top: 20px;
@@ -28,8 +30,9 @@ const MyButton = styled(Button)`
   }
 `;
 
-export default function HomePage() {
+export default function HomePage({ userId, userName }) {
   const [toggle, setToggle] = useState(true);
+  
 
   const clickHandler = () => {
     setToggle(!toggle);
@@ -51,9 +54,20 @@ export default function HomePage() {
         </MyButton>
       </div>
       <div className="shadow-sm shadow-black-400 m-auto p-1 lg:w-8/12 md:w-5/12 sm:w-3/4  flex flex-col justify-center items-center">
-        {toggle && "search" ? <SearchBox /> : <AddAccount />}
+        {toggle && "search" ? (
+          <SearchBox userId={userId} userName={userName} />
+        ) : (
+          <AddAccount userId={userId} userName={userName} />
+        )}
         {/* <SearchBox /> */}
       </div>
     </>
   );
 }
+
+
+// Prop Types validation
+HomePage.propTypes = {
+  userId: PropTypes.string.isRequired, // setValue prop is required and must be a function
+  userName: PropTypes.string.isRequired, // setValue prop is required and must be a function
+};

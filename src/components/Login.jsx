@@ -10,6 +10,8 @@ import { useFirebase, database } from "../context/firebase";
 import { useNavigate } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect } from "react";
+import Alert from "@mui/material/Alert";
+import CheckIcon from "@mui/icons-material/Check";
 
 const MyTextField = styled(TextField)`
   width: 90%;
@@ -28,7 +30,7 @@ const data = {
   password: "",
 };
 
-function Login({ setValue }) {
+function Login({ setValue, getUserCredential }) {
   const firebase = useFirebase();
   const db = database();
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ function Login({ setValue }) {
         const username = users[index].username;
         if (username === uname) {
           navigate("/home");
+          getUserCredential(uid, username);
         } else {
           setError(true);
         }
@@ -87,6 +90,9 @@ function Login({ setValue }) {
     <>
       <Box className="shadow-sm shadow-black-400 m-auto mt-2 p-4 lg:w-4/12 md:w-5/12 sm:w-3/4 flex flex-col justify-center items-center ">
         <AccountCircleIcon style={{ fontSize: "100px" }} />
+        <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
+          remember username and accountname must be lowercase!
+        </Alert>
         <Typography color="blue">Welcome back!</Typography>
         <MyTextField
           id="standard-basic"
@@ -126,7 +132,7 @@ function Login({ setValue }) {
           Create an account
         </MyButton>
         {error && true ? (
-          <Typography color="red">Invailed email and passwrod!</Typography>
+          <Alert severity="error">Fail to login!</Alert>
         ) : (
           <></>
         )}
@@ -138,6 +144,7 @@ function Login({ setValue }) {
 // Prop Types validation
 Login.propTypes = {
   setValue: PropTypes.func.isRequired, // setValue prop is required and must be a function
+  getUserCredential: PropTypes.func.isRequired, // setValue prop is required and must be a function
 };
 
 export default Login;
