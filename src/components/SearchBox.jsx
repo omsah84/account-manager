@@ -8,6 +8,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { database } from "../context/firebase";
 import PropTypes from "prop-types";
 import KeyValuePairs from "./KeyValuePairs";
+import Alert from "@mui/material/Alert";
+import CheckIcon from "@mui/icons-material/Check";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -43,6 +45,7 @@ function SearchBox({ userId, userName }) {
   const db = database();
   const [queryData, setQueryData] = useState([]);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [eMessage, setEMessage] = useState(false);
 
   // Function to get field values from a subdocument
   const getSubdocumentFieldValues = async (
@@ -67,6 +70,7 @@ function SearchBox({ userId, userName }) {
         console.log(queryData);
       } else {
         console.log("No such subdocument!");
+        setEMessage(true);
       }
     } catch (error) {
       console.error("Error getting subdocument:", error);
@@ -109,6 +113,7 @@ function SearchBox({ userId, userName }) {
           />
         </Search>
       </Paper>
+      {eMessage ? <Alert severity="success" sx={{marginTop:"10px"}}>No such information!</Alert> : <></>}
       {isSuccess ? <KeyValuePairs data={queryData} /> : <></>}
     </>
   );
