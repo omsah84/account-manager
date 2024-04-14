@@ -55,9 +55,6 @@ function Login({ setValue, getUserCredential }) {
         }
       }
     });
-
-    // console.log(users[ed].username)
-    // console.log(idx);
   };
 
   const fetchUsers = async () => {
@@ -78,6 +75,11 @@ function Login({ setValue, getUserCredential }) {
       .signinUserWithEmailAndPassword(loginData.email, loginData.password)
       .then((userCredential) => {
         getUserId(userCredential.user.uid, loginData.username);
+        setLoginData({
+          username: "",
+          email: "",
+          password: "",
+        });
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -91,7 +93,7 @@ function Login({ setValue, getUserCredential }) {
       <Box className="shadow-sm shadow-black-400 m-auto mt-2 p-4 lg:w-4/12 md:w-5/12 sm:w-3/4 flex flex-col justify-center items-center ">
         <AccountCircleIcon style={{ fontSize: "100px" }} />
         <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
-          remember username and accountname must be lowercase!
+          Username and account name must be lowercase!
         </Alert>
         <Typography color="blue">Welcome back!</Typography>
         <MyTextField
@@ -131,11 +133,7 @@ function Login({ setValue, getUserCredential }) {
         <MyButton variant="text" width="80%" onClick={() => setValue("signup")}>
           Create an account
         </MyButton>
-        {error && true ? (
-          <Alert severity="error">Fail to login!</Alert>
-        ) : (
-          <></>
-        )}
+        {error && true ? <Alert severity="error">Fail to login!</Alert> : <></>}
       </Box>
     </>
   );

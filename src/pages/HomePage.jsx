@@ -5,7 +5,6 @@ import { useState } from "react";
 import SearchBox from "../components/SearchBox";
 import PropTypes from "prop-types";
 
-
 const MyButton = styled(Button)`
   margin-top: 20px;
   text-transform: ${(props) => props.texttransform || "capitalize"};
@@ -31,30 +30,32 @@ const MyButton = styled(Button)`
 `;
 
 export default function HomePage({ userId, userName }) {
-  const [toggle, setToggle] = useState(true);
-  
-
-  const clickHandler = () => {
-    setToggle(!toggle);
-  };
-
+  const [toggle, setToggle] = useState("search");
   return (
     <>
       <div className="shadow-sm shadow-black-400 m-auto mt-2 p-4 lg:w-4/12 md:w-8/12 sm:w-4/4 flex flex-col justify-center items-center ">
-        <MyButton variant="text" width="80%" onClick={clickHandler}>
+        <MyButton
+          variant="text"
+          width="80%"
+          onClick={() => {
+            setToggle("search");
+          }}
+        >
           Search an account
         </MyButton>
         <MyButton
           variant="text"
           width="80%"
           margin="30px"
-          onClick={clickHandler}
+          onClick={() => {
+            setToggle("add");
+          }}
         >
           Add an account
         </MyButton>
       </div>
       <div className="shadow-sm shadow-black-400 m-auto p-1 lg:w-8/12 md:w-5/12 sm:w-3/4  flex flex-col justify-center items-center">
-        {toggle && "search" ? (
+        {toggle === "search" ? (
           <SearchBox userId={userId} userName={userName} />
         ) : (
           <AddAccount userId={userId} userName={userName} />
@@ -64,7 +65,6 @@ export default function HomePage({ userId, userName }) {
     </>
   );
 }
-
 
 // Prop Types validation
 HomePage.propTypes = {

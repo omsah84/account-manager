@@ -6,10 +6,12 @@ import Stack from "@mui/material/Stack";
 import { database } from "../context/firebase";
 import { collection, doc, setDoc } from "firebase/firestore";
 import PropTypes from "prop-types";
+import Alert from "@mui/material/Alert";
 
 function AddAccount({ userId, userName }) {
   const [accountName, setAccountName] = useState("");
   const [keyValuePairs, setKeyValuePairs] = useState([{ key: "", value: "" }]);
+  const [success, setSuccess] = useState(false);
 
   const db = database();
 
@@ -35,39 +37,28 @@ function AddAccount({ userId, userName }) {
     const newKeyValuePairs = keyValuePairs.filter((_, i) => i !== index);
     setKeyValuePairs(newKeyValuePairs);
   };
-
-  // Function to create the schema
   const createUserAccountData = async (
     db,
     userName,
     accountName,
     keyValuePairs
   ) => {
-    // Reference to the main collection 'users' and document 'user123'
     const userDocRef = doc(db, "userAccountData", userName);
-
-    // Set the main document (this step is optional if you only want to create subcollections)
-    await setDoc(userDocRef, {
-      /* document fields, if any */
-    });
-
-    // Reference to the subcollection 'accountData' within 'user123'
+    await setDoc(userDocRef, {});
     const accountDataCollectionRef = collection(userDocRef, accountName);
-
-    // Reference to the subdocument 'account456' within 'accountData'
     const accountDataDocRef = doc(accountDataCollectionRef, userId);
-
-    // Set the subdocument with fields
     await setDoc(accountDataDocRef, {
       keyValuePairs,
     });
+    setSuccess(true);
+    setAccountName("");
+    setKeyValuePairs([{ key: "", value: "" }]);
+    setTimeout(() => setSuccess(false), 2000);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Handle form submission logic here
     createUserAccountData(db, userName, accountName, keyValuePairs);
-    console.log({ accountName, keyValuePairs });
   };
 
   return (
@@ -134,6 +125,7 @@ function AddAccount({ userId, userName }) {
           >
             Submit
           </Button>
+          {success && true ? <Alert severity="success">Added</Alert> : <></>}
         </Stack>
       </form>
     </Container>

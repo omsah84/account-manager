@@ -8,8 +8,8 @@ import { useFirebase, database } from "../context/firebase";
 import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
-import Alert from '@mui/material/Alert';
-import CheckIcon from '@mui/icons-material/Check';
+import Alert from "@mui/material/Alert";
+import CheckIcon from "@mui/icons-material/Check";
 
 const MyTextField = styled(TextField)`
   width: 90%;
@@ -58,6 +58,11 @@ function Signup({ setValue }) {
         setSuccess(true);
         setError("");
         createUserProfile(userCredential.user.uid);
+        setSignupData({
+          username: "",
+          email: "",
+          password: "",
+        });
       })
       .catch((error) => {
         setError(error.message);
@@ -71,7 +76,7 @@ function Signup({ setValue }) {
         <AccountCircleIcon style={{ fontSize: "100px" }} />
         <Typography color="blue">Create an account</Typography>
         <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
-          remember username and accountname must be lowercase!
+          Username and account name must be lowercase!
         </Alert>
         <MyTextField
           id="standard-basic"
@@ -120,7 +125,7 @@ function Signup({ setValue }) {
           Already have an account
         </MyButton>
         {success && true ? (
-         <Alert severity="success">Successful signup.</Alert>
+          <Alert severity="success">Successful signup.</Alert>
         ) : (
           <></>
         )}
